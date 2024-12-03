@@ -16,13 +16,15 @@ module.exports = async (req, res) => {
     // Set CORS headers dynamically if the origin is allowed
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', '*'); // Fallback to allow all origins (if needed)
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Handle preflight OPTIONS request
     if (req.method === 'OPTIONS') {
-        res.status(200).end(); // End the preflight request
+        res.status(204).end(); // Respond with 204 for preflight and end request
         return;
     }
 
@@ -31,6 +33,7 @@ module.exports = async (req, res) => {
 
         // Validate input
         if (!type || !value) {
+            res.setHeader('Access-Control-Allow-Origin', origin || '*'); // Ensure CORS for all responses
             return res.status(400).json({ error: 'Missing type or value parameter' });
         }
 
@@ -45,6 +48,7 @@ module.exports = async (req, res) => {
                 value
             )}`;
         } else {
+            res.setHeader('Access-Control-Allow-Origin', origin || '*'); // Ensure CORS for all responses
             return res.status(400).json({ error: 'Invalid type. Must be "phone" or "email".' });
         }
 
@@ -54,6 +58,7 @@ module.exports = async (req, res) => {
         // Return the Abstract API response
         res.status(200).json(response.data);
     } catch (error) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*'); // Ensure CORS for all responses
         console.error('Error:', error.message);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
