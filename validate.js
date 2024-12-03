@@ -53,10 +53,35 @@ module.exports = async (req, res) => {
         }
 
         // Make the API request
-        const response = await axios.get(apiUrl);
+        try {
+            const response = await axios.get(apiUrl);
 
-        // Return the Abstract API response
-        res.status(200).json(response.data);
+            // Check if the response is valid
+            if (response.status === 200 && response.data) {
+                res.status(200).json(response.data); // Return the Abstract API response
+            } else {
+                console.error('Unexpected API response:', response.status, response.data);
+                res.status(502).json({ error: 'Unexpected API response' });
+            }
+        } catch (axiosError) {
+            // Handle specific axios errors
+            if (axiosError.response) {
+                // Server responded with a status outside of the 2xx range
+                console.error('API Error Response:', axiosError.response.status, axiosError.response.data);
+                res.status(axiosError.response.status).json({
+                    error: 'Error from API',
+                    details: axiosError.response.data,
+                });
+            } else if (axiosError.request) {
+                // Request was made but no response received
+                console.error('No response received from API:', axiosError.request);
+                res.status(504).json({ error: 'No response received from API' });
+            } else {
+                // Error during setup or another issue
+                console.error('Error setting up API request:', axiosError.message);
+                res.status(500).json({ error: 'Error setting up API request', details: axiosError.message });
+            }
+        }
     } catch (error) {
         res.setHeader('Access-Control-Allow-Origin', origin || '*'); // Ensure CORS for all responses
         console.error('Error:', error.message);
