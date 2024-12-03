@@ -1,0 +1,31 @@
+# Node.js dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Vercel
+.vercel
+
+# macOS system files
+.DS_Store
+
+# Editor-specific files
+.vscode/
+.idea/
+
+# Temp files
+*.tmp
+*.temp
+
+# Sensitive files
+api_keys.json
+config/secrets.json
+
+# Build output
+build/
+dist/
