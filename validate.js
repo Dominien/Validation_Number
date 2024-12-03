@@ -4,6 +4,28 @@ const axios = require('axios');
 require('dotenv').config();
 
 module.exports = async (req, res) => {
+    // Define allowed origins
+    const allowedOrigins = [
+        'https://marketer-ux-new.webflow.io',
+        'https://www.marketer-ux.com'
+    ];
+
+    // Get the request's origin
+    const origin = req.headers.origin;
+
+    // Set CORS headers dynamically if the origin is allowed
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        res.status(200).end(); // End the preflight request
+        return;
+    }
+
     try {
         const { type, value } = req.query; // Extract type (phone/email) and value from query parameters
 
